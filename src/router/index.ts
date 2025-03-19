@@ -19,6 +19,16 @@ const router = createRouter({
       component: () => import('../views/JobView.vue'),
     },
     {
+      path: '/jobs/add',
+      name: 'add-job',
+      component: () => import('../views/AddJobView.vue'),
+    },
+    {
+      path: '/jobs/edit/:id',
+      name: 'edit-job',
+      component: () => import('../views/EditView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
       component: () => import('@/views/NotFound.vue'),

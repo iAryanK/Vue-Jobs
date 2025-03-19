@@ -2,11 +2,14 @@
 // @ts-expect-error - vue-spinner doesn't support typescript
 import PulseLoader from 'vue-spinner/src/PulseLoader.vue'
 import { onMounted, reactive } from 'vue'
-import { RouterLink, useRoute } from 'vue-router'
+import { RouterLink, useRoute, useRouter } from 'vue-router'
 import type { JobType } from '@/components/JobListings.vue'
 import BackButton from '@/components/BackButton.vue'
+import { useToast } from 'vue-toastification'
 
 const route = useRoute()
+const router = useRouter()
+const toast = useToast()
 
 const jobId = route.params.id
 
@@ -19,12 +22,27 @@ onMounted(async () => {
   try {
     const response = await fetch(`/api/jobs/${jobId}`)
     state.job = await response.json()
+
+    console.error('[FETCHING JOB]', state.job)
   } catch (error) {
     console.error('[ERROR FETCHING JOB]', error)
   } finally {
     state.isLoading = false
   }
 })
+
+const deleteJob = async () => {
+  try {
+    await fetch(`/api/jobs/${jobId}`, {
+      method: 'DELETE',
+    })
+    toast.success('Job deleted successfully')
+    router.push('/jobs')
+  } catch (error) {
+    console.log('[ERROR DELETING JOB]', error)
+    toast.error('Job not deleted')
+  }
+}
 </script>
 
 <template>
@@ -37,7 +55,7 @@ onMounted(async () => {
             <div class="text-gray-500 mb-4">{{ state.job.type }}</div>
             <h1 class="text-3xl font-bold mb-4">{{ state.job.title }}</h1>
             <div class="text-gray-500 mb-4 flex align-middle justify-center md:justify-start">
-              <i class="fa-solid fa-location-dot text-lg text-orange-700 mr-2"></i>
+              <i class="pi pi-map-marker text-lg text-orange-700 mr-2"></i>
               <p class="text-orange-700">{{ state.job.location }}</p>
             </div>
           </div>
@@ -82,11 +100,12 @@ onMounted(async () => {
           <div class="bg-white p-6 rounded-lg shadow-md mt-6">
             <h3 class="text-xl font-bold mb-6">Manage Job</h3>
             <RouterLink
-              :to="`/jobs/${state.job.id}/edit`"
+              :to="`/jobs/edit/${state.job.id}`"
               class="bg-green-500 hover:bg-green-600 text-white text-center font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
               >Edit Job</RouterLink
             >
             <button
+              @click="deleteJob"
               class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-full w-full focus:outline-none focus:shadow-outline mt-4 block"
             >
               Delete Job
