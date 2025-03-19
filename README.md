@@ -1,6 +1,6 @@
-# hire-me
+# vue-jobs
 
-This template should help get you started developing with Vue 3 in Vite.
+<img src="public/screen.png" />
 
 ## Recommended IDE Setup
 
